@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!-- domain bean config -->
+	<bean id="notice" class="notice.model.Notice" />
+	
+	<!-- dao bean config -->
+	<bean id="factoryDao" class="notice.model.FactoryDao" factory-method="getInstance">
+		<constructor-arg>
+			<map>
+				<entry key="driver" value="oracle.jdbc.driver.OracleDriver" />
+				<entry key="url" value="jdbc:oracle:thin:@localhost:1521:XE"/>
+				<entry key="username" value="hr"/>
+				<entry key="password" value="tiger"/>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="factoryDao2" class="notice.model.FactoryDao" factory-method="getInstance">
+		<constructor-arg value="oracle.jdbc.driver.OracleDriver" />
+		<constructor-arg value="jdbc:oracle:thin:@localhost:1521:XE" />
+		<constructor-arg value="hr" />
+		<constructor-arg value="tiger" />
+	</bean>
+	
+	<bean id="factoryDao3" class="notice.model.FactoryDao" factory-method="getInstance">
+		<constructor-arg>
+			<list>
+				<value>oracle.jdbc.driver.OracleDriver</value>
+				<value>jdbc:oracle:thin:@localhost:1521:XE</value>
+				<value>hr</value>
+				<value>tiger</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="factoryDao4" class="notice.model.FactoryDao" factory-method="getInstance">
+		<constructor-arg>
+			<props>
+				<prop key="driver">oracle.jdbc.driver.OracleDrive</prop>
+				<prop key="url">jdbc:oracle:thin:@localhost:1521:XE</prop>
+				<prop key="username">hr</prop>
+				<prop key="password">tiger</prop>
+			</props>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 
+	<bean id="loginDao" class="notice.model.LoginDao">
+		<property name="factoryDao">
+			<ref bean="factoryDao" />
+		</property>
+	</bean>
+ 	-->
+	
+	<bean id="loginDao" class="notice.model.LoginDao">
+		<constructor-arg ref="factoryDao" />
+	</bean>
+	
+	<bean id="noticeDao" class="notice.model.NoticeDao">
+		<property name="factoryDao" ref="factoryDao"></property>
+	</bean>
+
+	<!-- service bean config -->
+	
+	<!-- controller bean config -->
+	<!-- 
+	<bean id="controller" class="notice.controller.Controller">
+		<property name="loginDao">
+			<ref bean="loginDao" />
+		</property>
+		<property name="noticeDao">
+			<ref bean="noticeDao" />
+		</property>
+	</bean>
+	-->
+	
+	<bean id="controller" class="notice.controller.Controller">
+		<constructor-arg ref="loginDao" />
+		<constructor-arg ref="noticeDao" />
+	</bean>
+	
+	<!-- view bean config -->
+	<bean id="menu" class="notice.view.MenuView">
+		<property name="controller" ref="controller"></property>
+	</bean>
+	
+	<!-- test bean config -->
+	<bean id="test" class="notice.model.TestClass">
+	</bean>
+	
+	<bean id="service" class="notice.model.Service" scope="prototype">
+		<constructor-arg>
+			<set>
+				<ref bean="controller"/>
+				<ref bean="test" />
+			</set>
+		</constructor-arg>
+	</bean>
+</beans>
